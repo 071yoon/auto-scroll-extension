@@ -1,3 +1,22 @@
+function getScrollDiv() {
+  return document.querySelector("[auto-scroll-id]");
+}
+
+function clearCustomInterval(scrollDiv: Element | null = null) {
+  if (scrollDiv) {
+    clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
+  } else {
+    const tmp = document.createElement("div");
+    document.body.appendChild(tmp);
+    tmp.setAttribute("auto-scroll-id", "true");
+  }
+}
+
+function setIntervalToDiv(scrollDiv: Element | null, newInterval: number) {
+  if (!scrollDiv) return;
+  return scrollDiv.setAttribute("auto-scroll-id", String(newInterval));
+}
+
 export const onNatural = () => {
   (function () {
     let queryOptions = { active: true, lastFocusedWindow: true };
@@ -8,20 +27,14 @@ export const onNatural = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          const isScrolling = document.querySelector("[auto-scroll-id]");
-          if (isScrolling) {
-            clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
-          } else {
-            const tmp = document.createElement("div");
-            document.body.appendChild(tmp);
-            tmp.setAttribute("auto-scroll-id", "true");
-          }
+          const scrollDiv = getScrollDiv();
+          clearCustomInterval(scrollDiv);
+
           const newInterval = setInterval(function () {
             window.scrollBy(0, 2);
           }, 15);
-          document
-            .querySelector("[auto-scroll-id]")
-            ?.setAttribute("auto-scroll-id", String(newInterval));
+
+          setIntervalToDiv(scrollDiv, Number(newInterval));
         },
         args: [],
       });
@@ -39,20 +52,14 @@ export const on10Sec = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          const isScrolling = document.querySelector("[auto-scroll-id]");
-          if (isScrolling) {
-            clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
-          } else {
-            const tmp = document.createElement("div");
-            document.body.appendChild(tmp);
-            tmp.setAttribute("auto-scroll-id", "true");
-          }
+          const scrollDiv = getScrollDiv();
+          clearCustomInterval(scrollDiv);
+
           const newInterval = setInterval(function () {
             window.scrollBy(0, 800);
           }, 6000);
-          document
-            .querySelector("[auto-scroll-id]")
-            ?.setAttribute("auto-scroll-id", String(newInterval));
+
+          setIntervalToDiv(scrollDiv, Number(newInterval));
         },
         args: [],
       });
@@ -70,20 +77,14 @@ export const onStart = (scrollValue: number, scrollTime: number) => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (sv: number, st: number) => {
-          const isScrolling = document.querySelector("[auto-scroll-id]");
-          if (isScrolling) {
-            clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
-          } else {
-            const tmp = document.createElement("div");
-            document.body.appendChild(tmp);
-            tmp.setAttribute("auto-scroll-id", "true");
-          }
+          const scrollDiv = getScrollDiv();
+          clearCustomInterval(scrollDiv);
+
           const newInterval = setInterval(function () {
             window.scrollBy(0, sv);
           }, st);
-          document
-            .querySelector("[auto-scroll-id]")
-            ?.setAttribute("auto-scroll-id", String(newInterval));
+
+          setIntervalToDiv(scrollDiv, Number(newInterval));
         },
         args: [scrollValue, scrollTime],
       });
@@ -101,7 +102,7 @@ export const onEnd = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          const isScrolling = document.querySelector("[auto-scroll-id]");
+          const isScrolling = getScrollDiv();
           if (isScrolling) {
             clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
           }

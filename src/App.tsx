@@ -1,11 +1,12 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Button, Slider } from "@mui/joy";
 import { on10Sec, onEnd, onNatural, onStart } from "./scrollFunctions";
 
-const App = () => {
-  const [scrollValue, setScrollValue] = React.useState(2);
-  const [scrollTime, setScrollTime] = React.useState(15);
+export default function App() {
+  const [scrollValue, setScrollValue] = useState(2);
+  const [scrollTime, setScrollTime] = useState(15);
 
   const updateValues = (scrollValue: number, scrollTime: number) => {
     chrome.storage.sync.set({ scrollValue: scrollValue.toString() });
@@ -15,7 +16,7 @@ const App = () => {
   };
 
   // set state from storage if have one
-  React.useEffect(() => {
+  useEffect(() => {
     chrome.storage.sync.get(["scrollValue", "scrollTime"], (result) => {
       if (result.scrollValue === undefined) {
         chrome.storage.sync.set({ scrollValue: 2 });
@@ -85,7 +86,7 @@ const App = () => {
       </Buttons>
     </Container>
   );
-};
+}
 
 const Container = styled.div`
   padding: 0.2rem 0.4rem;
@@ -103,5 +104,3 @@ const Buttons = styled.div`
   display: flex;
   gap: 0.4rem;
 `;
-
-export default App;
