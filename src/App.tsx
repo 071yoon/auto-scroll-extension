@@ -1,11 +1,20 @@
 import * as React from "react";
 import styled from "@emotion/styled";
 import { Button, Slider } from "@mui/joy";
+import { on10Sec, onEnd, onNatural, onStart } from "./scrollFunctions";
 
 const App = () => {
   const [scrollValue, setScrollValue] = React.useState(2);
   const [scrollTime, setScrollTime] = React.useState(15);
 
+  const updateValues = (scrollValue: number, scrollTime: number) => {
+    chrome.storage.sync.set({ scrollValue: scrollValue.toString() });
+    chrome.storage.sync.set({ scrollTime: scrollTime.toString() });
+    setScrollValue(scrollValue);
+    setScrollTime(scrollTime);
+  };
+
+  // set state from storage if have one
   React.useEffect(() => {
     chrome.storage.sync.get(["scrollValue", "scrollTime"], (result) => {
       if (result.scrollValue === undefined) {
@@ -21,60 +30,27 @@ const App = () => {
     });
   }, []);
 
-  const onStart = () => {
-    (function () {
-      let queryOptions = { active: true, lastFocusedWindow: true };
-      chrome.tabs.query(queryOptions, ([tab]) => {
-        if (chrome.runtime.lastError) console.error(chrome.runtime.lastError);
-
-        // @ts-ignore
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: (sv: number, st: number) => {
-            const isScrolling = document.querySelector("[auto-scroll-id]");
-            if (isScrolling) {
-              clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
-            } else {
-              const tmp = document.createElement("div");
-              document.body.appendChild(tmp);
-              tmp.setAttribute("auto-scroll-id", "true");
-            }
-            const newInterval = setInterval(function () {
-              window.scrollBy(0, sv);
-            }, st);
-            document
-              .querySelector("[auto-scroll-id]")
-              ?.setAttribute("auto-scroll-id", String(newInterval));
-          },
-          args: [scrollValue, scrollTime],
-        });
-      });
-    })();
-  };
-
-  const onEnd = () => {
-    (function () {
-      let queryOptions = { active: true, lastFocusedWindow: true };
-      chrome.tabs.query(queryOptions, ([tab]) => {
-        if (chrome.runtime.lastError) console.error(chrome.runtime.lastError);
-
-        // @ts-ignore
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: () => {
-            const isScrolling = document.querySelector("[auto-scroll-id]");
-            if (isScrolling) {
-              clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
-            }
-          },
-        });
-      });
-    })();
-  };
-
   return (
     <Container>
       <Title>Auto Scroller</Title>
+      <Buttons>
+        <Button
+          onClick={() => {
+            onNatural();
+            updateValues(2, 15);
+          }}
+        >
+          자연스럽게
+        </Button>
+        <Button
+          onClick={() => {
+            on10Sec();
+            updateValues(800, 6000);
+          }}
+        >
+          10초에 한번씩
+        </Button>
+      </Buttons>
       <div>한번에 얼마나 많이</div>
       <Slider
         key={scrollValue}
@@ -102,7 +78,9 @@ const App = () => {
         min={15}
       />
       <Buttons>
-        <Button onClick={onStart}>내려가기</Button>
+        <Button onClick={() => onStart(scrollValue, scrollTime)}>
+          내려가기
+        </Button>
         <Button onClick={onEnd}>멈추기</Button>
       </Buttons>
     </Container>
