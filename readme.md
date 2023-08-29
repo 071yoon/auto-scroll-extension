@@ -1,23 +1,12 @@
-# Chrome Extension boilerplate created with React Typescript
+# Auto Scroll Chrome Extension
 
 ## Getting started
 
-Create a project based on this boilerplate.
-
-```
-$ npx degit https://github.com/sivertschou/react-typescript-chrome-extension-boilerplate.git#christmas <project-name>
-```
-
-Navigate to the project directory and install the dependencies.
-
-```
-$ npm install
-```
-
-To build the extension, and rebuild it when the files are changed, run
-
-```
-$ npm start
+```shell
+# to install
+yarn install
+# to build -> will get `dist`
+yarn build
 ```
 
 After the project has been built, a directory named `dist` has been created. You have to add this directory to your Chrome browser:
