@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension-react-typescript-boilerplate",
-  "version": "1.0.1",
-  "description": "",
+  "name": "auto-scroll-extension",
+  "version": "1.0.2",
+  "description": "Auto Scroller for Chrome to help user scroll automatically",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
