@@ -1,13 +1,14 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import styled from "@emotion/styled";
-import { Button, Slider } from "@mui/joy";
+import { Button, Input, Slider } from "@mui/joy";
 import { on10Sec, onEnd, onNatural, onStart } from "./scrollFunctions";
 
 export default function App() {
   const [scrollValue, setScrollValue] = useState(2);
   const [scrollTime, setScrollTime] = useState(15);
 
+  // update storage and state at once
   const updateValues = (scrollValue: number, scrollTime: number) => {
     chrome.storage.sync.set({ scrollValue: scrollValue.toString() });
     chrome.storage.sync.set({ scrollTime: scrollTime.toString() });
@@ -53,31 +54,55 @@ export default function App() {
         </Button>
       </Buttons>
       <div>한번에 얼마나 많이</div>
-      <Slider
-        key={scrollValue}
-        defaultValue={scrollValue}
-        onChange={(e, value) => {
-          chrome.storage.sync.set({ scrollValue: value.toString() });
-          setScrollValue(value as number);
-        }}
-        step={250}
-        max={1004}
-        marks
-        min={2}
-      />
+      <div style={{ display: "flex" }}>
+        <Slider
+          key={scrollValue}
+          defaultValue={scrollValue}
+          onChange={(e, value) => {
+            chrome.storage.sync.set({ scrollValue: value.toString() });
+            setScrollValue(value as number);
+          }}
+          max={1004}
+          marks
+          min={0.5}
+        />
+        <Input
+          size={"sm"}
+          sx={{ width: "5rem" }}
+          value={scrollValue}
+          onChange={(event) => {
+            chrome.storage.sync.set({
+              scrollValue: event.target.value.toString(),
+            });
+            setScrollValue(event.target.value as unknown as number);
+          }}
+        />
+      </div>
       <div>얼마나 자주</div>
-      <Slider
-        key={scrollTime}
-        defaultValue={scrollTime}
-        onChange={(e, value) => {
-          chrome.storage.sync.set({ scrollTime: value.toString() });
-          setScrollTime(value as number);
-        }}
-        step={500}
-        max={6000}
-        marks
-        min={15}
-      />
+      <div style={{ display: "flex" }}>
+        <Slider
+          key={scrollTime}
+          defaultValue={scrollTime}
+          onChange={(e, value) => {
+            chrome.storage.sync.set({ scrollTime: value.toString() });
+            setScrollTime(value as number);
+          }}
+          max={6000}
+          marks
+          min={15}
+        />
+        <Input
+          size={"sm"}
+          sx={{ width: "5rem" }}
+          value={scrollTime}
+          onChange={(event) => {
+            chrome.storage.sync.set({
+              scrollTime: event.target.value.toString(),
+            });
+            setScrollTime(event.target.value as unknown as number);
+          }}
+        />
+      </div>
       <Buttons>
         <Button onClick={() => onStart(scrollValue, scrollTime)}>
           내려가기

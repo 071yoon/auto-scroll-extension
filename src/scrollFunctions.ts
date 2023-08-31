@@ -1,15 +1,21 @@
+// TODO: make scroll functions reuseable
+// now it can't be reusable since func: () won't get functions
 function getScrollDiv() {
-  return document.querySelector("[auto-scroll-id]");
+  const scrollDiv = document.querySelector("[auto-scroll-id]");
+  if (scrollDiv) {
+    return scrollDiv;
+  }
+  const tmp = document.createElement("div");
+  document.body.appendChild(tmp);
+  tmp.setAttribute("auto-scroll-id", "true");
+  return tmp;
 }
 
-function clearCustomInterval(scrollDiv: Element | null = null) {
+function clearCustomInterval(scrollDiv: Element | null) {
   if (scrollDiv) {
-    clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
-  } else {
-    const tmp = document.createElement("div");
-    document.body.appendChild(tmp);
-    tmp.setAttribute("auto-scroll-id", "true");
+    return clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
   }
+  return null;
 }
 
 function setIntervalToDiv(scrollDiv: Element | null, newInterval: number) {
@@ -27,14 +33,19 @@ export const onNatural = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          const scrollDiv = getScrollDiv();
-          clearCustomInterval(scrollDiv);
+          let scrollDiv = document.querySelector("[auto-scroll-id]");
+          if (!scrollDiv) {
+            scrollDiv = document.createElement("div");
+            document.body.appendChild(scrollDiv);
+            scrollDiv.setAttribute("auto-scroll-id", "true");
+          }
+          clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
 
           const newInterval = setInterval(function () {
             window.scrollBy(0, 2);
           }, 15);
 
-          setIntervalToDiv(scrollDiv, Number(newInterval));
+          scrollDiv.setAttribute("auto-scroll-id", String(newInterval));
         },
         args: [],
       });
@@ -52,14 +63,19 @@ export const on10Sec = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          const scrollDiv = getScrollDiv();
-          clearCustomInterval(scrollDiv);
+          let scrollDiv = document.querySelector("[auto-scroll-id]");
+          if (!scrollDiv) {
+            scrollDiv = document.createElement("div");
+            document.body.appendChild(scrollDiv);
+            scrollDiv.setAttribute("auto-scroll-id", "true");
+          }
+          clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
 
           const newInterval = setInterval(function () {
             window.scrollBy(0, 800);
           }, 6000);
 
-          setIntervalToDiv(scrollDiv, Number(newInterval));
+          scrollDiv.setAttribute("auto-scroll-id", String(newInterval));
         },
         args: [],
       });
@@ -77,14 +93,19 @@ export const onStart = (scrollValue: number, scrollTime: number) => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (sv: number, st: number) => {
-          const scrollDiv = getScrollDiv();
-          clearCustomInterval(scrollDiv);
+          let scrollDiv = document.querySelector("[auto-scroll-id]");
+          if (!scrollDiv) {
+            scrollDiv = document.createElement("div");
+            document.body.appendChild(scrollDiv);
+            scrollDiv.setAttribute("auto-scroll-id", "true");
+          }
+          clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
 
           const newInterval = setInterval(function () {
             window.scrollBy(0, sv);
           }, st);
 
-          setIntervalToDiv(scrollDiv, Number(newInterval));
+          scrollDiv.setAttribute("auto-scroll-id", String(newInterval));
         },
         args: [scrollValue, scrollTime],
       });
@@ -102,10 +123,13 @@ export const onEnd = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          const isScrolling = getScrollDiv();
-          if (isScrolling) {
-            clearInterval(Number(isScrolling.getAttribute("auto-scroll-id")));
+          let scrollDiv = document.querySelector("[auto-scroll-id]");
+          if (!scrollDiv) {
+            scrollDiv = document.createElement("div");
+            document.body.appendChild(scrollDiv);
+            scrollDiv.setAttribute("auto-scroll-id", "true");
           }
+          clearInterval(Number(scrollDiv.getAttribute("auto-scroll-id")));
         },
       });
     });
