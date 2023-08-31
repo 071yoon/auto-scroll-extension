@@ -1,8 +1,8 @@
 {
   "name": "Auto Scroll Extension",
-  "description": "Auto Scroller for Chrome",
+  "description": "Auto Scroller for Chrome to help user scroll automatically",
   "manifest_version": 3,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "permissions": ["activeTab", "scripting", "storage"],
   "icons": {
     "16": "icon16.png",
