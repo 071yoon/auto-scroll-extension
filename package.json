@@ -1,6 +1,6 @@
 {
   "name": "auto-scroll-extension",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Auto Scroller for Chrome to help user scroll automatically",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
