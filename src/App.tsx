@@ -1,12 +1,14 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import styled from "@emotion/styled";
-import { Button, Input, Slider } from "@mui/joy";
+import { Button, Option, Input, Select, Slider } from "@mui/joy";
 import { on10Sec, onEnd, onNatural, onStart } from "./scrollFunctions";
+import { languageDictionary, Language } from "./language";
 
 export default function App() {
   const [scrollValue, setScrollValue] = useState(2);
   const [scrollTime, setScrollTime] = useState(15);
+  const [language, setLanguage] = useState<Language>("en");
 
   // update storage and state at once
   const updateValues = (scrollValue: number, scrollTime: number) => {
@@ -16,44 +18,71 @@ export default function App() {
     setScrollTime(scrollTime);
   };
 
+  const handleLanguageChange = (
+    e: React.SyntheticEvent | null,
+    newValue: Language | null
+  ) => {
+    setLanguage(newValue || "en");
+    chrome.storage.sync.set({ language: newValue });
+  };
+
   // set state from storage if have one
   useEffect(() => {
-    chrome.storage.sync.get(["scrollValue", "scrollTime"], (result) => {
-      if (result.scrollValue === undefined) {
-        chrome.storage.sync.set({ scrollValue: 2 });
-      } else {
-        setScrollValue(Number(result.scrollValue));
+    chrome.storage.sync.get(
+      ["scrollValue", "scrollTime", "language"],
+      (result) => {
+        if (result.scrollValue === undefined) {
+          chrome.storage.sync.set({ scrollValue: 2 });
+        } else {
+          setScrollValue(Number(result.scrollValue));
+        }
+
+        if (result.scrollTime === undefined) {
+          chrome.storage.sync.set({ scrollTime: 15 });
+        } else {
+          setScrollTime(Number(result.scrollTime));
+        }
+
+        if (result.language === undefined) {
+          chrome.storage.sync.set({ language: "en" });
+        } else {
+          setLanguage(result.language);
+        }
       }
-      if (result.scrollTime === undefined) {
-        chrome.storage.sync.set({ scrollTime: 15 });
-      } else {
-        setScrollTime(Number(result.scrollTime));
-      }
-    });
+    );
   }, []);
 
   return (
     <Container>
       <Title>Auto Scroller</Title>
+      <LanguageContainer>
+        language:
+        <Select value={language} onChange={handleLanguageChange} size="sm">
+          <Option value="ko">Korean</Option>
+          <Option value="en">English</Option>
+        </Select>
+      </LanguageContainer>
       <Buttons>
         <Button
           onClick={() => {
             onNatural();
             updateValues(2, 15);
           }}
+          size="sm"
         >
-          자연스럽게
+          {languageDictionary[language].natural}
         </Button>
         <Button
           onClick={() => {
             on10Sec();
             updateValues(800, 6000);
           }}
+          size="sm"
         >
-          10초에 한번씩
+          {languageDictionary[language].interval}
         </Button>
       </Buttons>
-      <div>한번에 얼마나 많이</div>
+      <div>{languageDictionary[language].much}</div>
       <div style={{ display: "flex" }}>
         <Slider
           key={scrollValue}
@@ -67,7 +96,7 @@ export default function App() {
           min={0.5}
         />
         <Input
-          size={"sm"}
+          size="sm"
           sx={{ width: "5rem" }}
           value={scrollValue}
           onChange={(event) => {
@@ -78,7 +107,7 @@ export default function App() {
           }}
         />
       </div>
-      <div>얼마나 자주</div>
+      <div>{languageDictionary[language].sequence}</div>
       <div style={{ display: "flex" }}>
         <Slider
           key={scrollTime}
@@ -92,7 +121,7 @@ export default function App() {
           min={15}
         />
         <Input
-          size={"sm"}
+          size="sm"
           sx={{ width: "5rem" }}
           value={scrollTime}
           onChange={(event) => {
@@ -104,10 +133,12 @@ export default function App() {
         />
       </div>
       <Buttons>
-        <Button onClick={() => onStart(scrollValue, scrollTime)}>
-          내려가기
+        <Button onClick={() => onStart(scrollValue, scrollTime)} size="sm">
+          {languageDictionary[language].down}
         </Button>
-        <Button onClick={onEnd}>멈추기</Button>
+        <Button onClick={onEnd} size="sm">
+          {languageDictionary[language].stop}
+        </Button>
       </Buttons>
     </Container>
   );
@@ -115,7 +146,15 @@ export default function App() {
 
 const Container = styled.div`
   padding: 0.2rem 0.4rem;
-  width: 10rem;
+  width: 15rem;
+`;
+
+const LanguageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: flex-end;
+  margin: 0.4rem 0;
 `;
 
 const Title = styled.div`
@@ -127,5 +166,8 @@ const Title = styled.div`
 
 const Buttons = styled.div`
   display: flex;
-  gap: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0 0 0.4rem 0;
 `;
